@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>Cart Quality:</h2>
+    <button>Show Quantity</button>
+    <button>Add to Cart</button>
+    <button>+2</button>
+    <button>+3</button>
+    <button>Reset Cart</button>
+    <script>
+        let cartQuantity = 0;
+        const buttons = document.querySelectorAll("button");
+
+        buttons[0].onclick = function() {
+            alert("Cart Quantity: " + cartQuantity);
+            console.log("Cart Quantity: " + cartQuantity);
+        };
+
+        buttons[1].onclick = function() {
+            cartQuantity += 1;
+            alert("Added 1 item to cart. Total: " + cartQuantity);
+        };
+
+        buttons[2].onclick = function() {
+            cartQuantity += 2;
+            alert("Added 2 items to cart. Total: " + cartQuantity);
+        };
+
+        buttons[3].onclick = function() {
+            cartQuantity += 3;
+            alert("Added 3 items to cart. Total: " + cartQuantity);
+        };
+
+        buttons[4].onclick = function() {
+            cartQuantity = 0;
+            alert("Cart reset. Total: " + cartQuantity);
+        };
+    </script>
+</body>
+</html>
