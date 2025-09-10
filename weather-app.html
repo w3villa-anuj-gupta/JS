@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-6">
+
+  <h1 class="text-2xl font-bold mb-6">☁️ Weather App</h1>
+
+  <!-- Weather Section -->
+  <div class="bg-white shadow-md rounded-2xl p-6 m-2 w-96 text-center">
+    <h2 class="text-lg font-semibold mb-4">Check Weather by City</h2>
+    <input id="cityInput" type="text" placeholder="Enter city name" class="border p-2 rounded-lg w-2/3 mb-3">
+    <button onclick="getWeather()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Get Weather</button>
+    <div id="weather" class="text-gray-700 mt-4"></div>
+  </div>
+
+  <script>
+    async function getWeather() {
+      let city = document.getElementById("cityInput").value;
+      if (!city) {
+        document.getElementById("weather").innerText = "Please enter a city name";
+        return;
+      }
+
+      try {
+        // Get city coordinates using Open-Meteo geocoding API
+        let geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=1`);
+        let geoData = await geoRes.json();
+
+        if (!geoData.results || geoData.results.length === 0) {
+          document.getElementById("weather").innerText = "City not found";
+          return;
+        }
+
+        let { latitude, longitude, name, country } = geoData.results[0];
+
+        // Fetch detailed weather using coordinates
+        let res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=relativehumidity_2m,weathercode`);
+        let data = await res.json();
+        let weather = data.current_weather;
+
+        // Map weather codes to emoji
+        const weatherIcons = {
+          0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️',
+          45: '🌫️', 48: '🌫️', 51: '🌦️', 53: '🌦️', 55: '🌦️',
+          61: '🌧️', 63: '🌧️', 65: '🌧️', 71: '❄️', 73: '❄️', 75: '❄️',
+          80: '🌦️', 81: '🌧️', 82: '🌧️', 95: '⛈️', 96: '⛈️', 99: '⛈️'
+        };
+
+        // Get humidity from hourly (approx current hour)
+        let currentHourIndex = new Date().getHours();
+        let code = weather.weathercode;
+        let icon = weatherIcons[code] || '';
+
+        document.getElementById("weather").innerHTML = `
+          <p>📍 <strong>${name}, ${country}</strong></p>
+          <p>${icon} <strong>Temperature:</strong> ${weather.temperature}°C</p>
+          <p>🌬️ <strong>Wind:</strong> ${weather.windspeed} km/h</p>
+          <p>🕒 <strong>Time:</strong> ${weather.time}</p>
+        `;
+
+      } catch (error) {
+        document.getElementById("weather").innerText = "⚠️ Error fetching weather";
+      }
+    }
+  </script>
+
+</body>
+</html>
